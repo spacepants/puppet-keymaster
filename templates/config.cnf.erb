@@ -1,0 +1,40 @@
+# File managed by Puppet
+# OpenSSL configuration file.
+
+# Establish working directory.
+
+dir      = .
+HOME     = .
+RANDFILE = $ENV::HOME/.rnd
+
+[ req ]
+default_bits       = 4096
+default_keyfile    = <%= @cert_key_file %>
+default_md         = sha256
+prompt             = no
+distinguished_name = req_distinguished_name
+<%- if @aliases and not @aliases.empty? -%>
+req_extensions     = req_aliases
+<%- end -%>
+
+[ req_distinguished_name ]
+commonName             = <%= @common_name %>
+<%- if @country -%>
+countryName            = <%= @country %>
+<%- end -%>
+<%- if @organization -%>
+organizationName       = <%= @organization %>
+<%- end -%>
+<%- if @locality -%>
+localityName           = <%= @locality %>
+<%- end -%>
+<%- if @state -%>
+stateOrProvinceName    = <%= @state %>
+<%- end -%>
+<%- if @email -%>
+emailAddress           = <%= @email %>
+<%- end -%>
+<%- if ! @aliases.empty? -%>
+[ req_aliases ]
+subjectAltName = "<%= @aliases.collect {|i| "DNS: #{i}" }.join(', ') -%>"
+<%- end -%>

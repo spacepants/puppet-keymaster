@@ -1,0 +1,14 @@
+{
+<%- if @api_user -%>
+  "username": "<%= @api_user %>",
+<%- end -%>
+<%- if @api_pass -%>
+  "password": "<%= @api_pass %>",
+<%- end -%>
+<%- if @api_org -%>
+  "orgid": "<%= @api_org %>",
+<%- end -%>
+<%- if @api_key -%>
+  "secret": "<%= @api_key %>"
+<%- end -%>
+}
