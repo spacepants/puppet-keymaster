@@ -274,6 +274,150 @@ describe 'keymaster::x509', type: :define do
             )
           }
         end
+        context 'when generating a wildcard certificate' do
+          let(:title) {
+            '*.example.org'
+          }
+          let(:params) {{
+            common_name: '*.example.org',
+          }}
+          it { is_expected.to contain_file('x509_wild.example.org_dir').with(
+            ensure: 'directory',
+            path:   '/etc/puppetlabs/keymaster/x509/wild.example.org',
+            mode:   '0750',
+            owner:  'puppet',
+            group:  'puppet'
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_cnf').with(
+            ensure: 'file',
+            path:   '/etc/puppetlabs/keymaster/x509/wild.example.org/config.cnf',
+            mode:   '0640',
+            owner:  'puppet',
+            group:  'puppet'
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_key').with(
+            ensure: 'file',
+            path:   '/etc/puppetlabs/keymaster/x509/wild.example.org/key.pem',
+            mode:   '0640',
+            owner:  'puppet',
+            group:  'puppet'
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_csr').with(
+            ensure: 'file',
+            path:   '/etc/puppetlabs/keymaster/x509/wild.example.org/request.csr',
+            mode:   '0640',
+            owner:  'puppet',
+            group:  'puppet'
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_pem').with(
+            ensure: 'file',
+            path:   '/etc/puppetlabs/keymaster/x509/wild.example.org/certificate.pem',
+            mode:   '0640',
+            owner:  'puppet',
+            group:  'puppet'
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_id').with(
+            ensure: 'file',
+            path:   '/etc/puppetlabs/keymaster/x509/wild.example.org/id',
+            mode:   '0640',
+            owner:  'puppet',
+            group:  'puppet'
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_renewid').with(
+            ensure: 'file',
+            path:   '/etc/puppetlabs/keymaster/x509/wild.example.org/renewid',
+            mode:   '0640',
+            owner:  'puppet',
+            group:  'puppet'
+            )
+          }
+          it { is_expected.to contain_exec('x509_wild.example.org_key').with(
+            path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
+            command: 'openssl genrsa -out /etc/puppetlabs/keymaster/x509/wild.example.org/key.pem 4096',
+            user:    'puppet',
+            group:   'puppet',
+            creates: '/etc/puppetlabs/keymaster/x509/wild.example.org/key.pem',
+            ).that_requires('File[x509_wild.example.org_cnf]').that_comes_before(
+              'File[x509_wild.example.org_key]'
+            )
+          }
+          it { is_expected.to contain_exec('x509_wild.example.org_csr').with(
+            path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
+            command: 'openssl req -new -key /etc/puppetlabs/keymaster/x509/wild.example.org/key.pem -out /etc/puppetlabs/keymaster/x509/wild.example.org/request.csr -config /etc/puppetlabs/keymaster/x509/wild.example.org/config.cnf',
+            user:    'puppet',
+            group:   'puppet',
+            creates: '/etc/puppetlabs/keymaster/x509/wild.example.org/request.csr',
+            ).that_requires('File[x509_wild.example.org_key]').that_comes_before(
+              'File[x509_wild.example.org_csr]'
+            )
+          }
+          it { is_expected.to contain_exec('x509_wild.example.org_submit_csr').with(
+            path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
+            command: 'ruby cert-manager.rb --submit-csr --name *.example.org --aliases  --term 3',
+            user:    'puppet',
+            group:   'puppet',
+            creates: '/etc/puppetlabs/keymaster/x509/wild.example.org/id',
+            ).that_requires('File[x509_wild.example.org_csr]').that_comes_before(
+              'File[x509_wild.example.org_id]'
+            )
+          }
+          it { is_expected.to contain_exec('x509_wild.example.org_pem').with(
+            path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
+            command: 'ruby cert-manager.rb --get-cert',
+            user:    'puppet',
+            group:   'puppet',
+            creates: '/etc/puppetlabs/keymaster/x509/wild.example.org/certificate.pem',
+            ).that_requires('File[x509_wild.example.org_id]').that_comes_before(
+              'File[x509_wild.example.org_pem]'
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_cnf').with_content(
+            %r{default_keyfile    = /etc/puppetlabs/keymaster/x509/wild.example.org/key.pem}
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_cnf').with_content(
+            /commonName             = \*.example.org/
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_cnf').without_content(
+            /req_extensions     = req_aliases/
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_cnf').without_content(
+            /localityName           = /
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_cnf').without_content(
+            /stateOrProvinceName    = /
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_cnf').without_content(
+            /emailAddress           = /
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_cnf').without_content(
+            /\[ req_aliases \]/
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_cnf').without_content(
+            /subjectAltName = "/
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_cnf').without_content(
+            /countryName            =/
+            )
+          }
+          it { is_expected.to contain_file('x509_wild.example.org_cnf').without_content(
+            /organizationName       =/
+            )
+          }
+        end
       end
     end
   end
