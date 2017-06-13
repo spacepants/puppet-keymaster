@@ -3,7 +3,6 @@ require 'base64'
 require 'json'
 require 'mixlib/cli'
 require 'openssl'
-require 'pp'
 require 'savon'
 
 class CertManager
