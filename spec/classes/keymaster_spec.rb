@@ -52,19 +52,22 @@ describe 'keymaster' do
           )
         }
 
-        it { is_expected.to contain_package('json').with(
-          ensure:   'installed',
-          provider: 'gem',
+        it { is_expected.to contain_exec('install json').with(
+          command: 'gem install --no-ri --no-rdoc json',
+          path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin',
+          unless:  'gem list | grep json',
           )
         }
-        it { is_expected.to contain_package('mixlib-cli').with(
-          ensure:   'installed',
-          provider: 'gem',
+        it { is_expected.to contain_exec('install mixlib-cli').with(
+          command: 'gem install --no-ri --no-rdoc mixlib-cli',
+          path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin',
+          unless:  'gem list | grep mixlib-cli',
           )
         }
-        it { is_expected.to contain_package('savon').with(
-          ensure:   'installed',
-          provider: 'gem',
+        it { is_expected.to contain_exec('install savon').with(
+          command: 'gem install --no-ri --no-rdoc savon',
+          path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin',
+          unless:  'gem list | grep savon',
           )
         }
         it { is_expected.to contain_file('/usr/local/bin/cert-manager.rb').with(

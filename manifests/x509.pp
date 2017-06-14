@@ -42,7 +42,7 @@ define keymaster::x509 (
   $clean_name = regsubst($name, '[*]', 'wild', 'G')
 
   # Set resource defaults
-  Exec { path => '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin' }
+  Exec { path => "${::keymaster::ruby_path}:/usr/bin:/usr/sbin:/bin:/sbin" }
 
   File {
     owner => $::keymaster::user,
@@ -110,7 +110,6 @@ define keymaster::x509 (
       exec{"x509_${clean_name}_submit_csr":
         command => "ruby cert-manager.rb --submit-csr --name ${common_name} --aliases ${alias_string} --term ${term}",
         cwd     => $cert_src_dir,
-        path    => $::keymaster::ruby_path,
         user    => $::keymaster::user,
         group   => $::keymaster::group,
         creates => $cert_id_file,
@@ -127,7 +126,6 @@ define keymaster::x509 (
       exec{"x509_${clean_name}_pem":
         command => 'ruby cert-manager.rb --get-cert',
         cwd     => $cert_src_dir,
-        path    => $::keymaster::ruby_path,
         user    => $::keymaster::user,
         group   => $::keymaster::group,
         creates => $cert_pem_file,

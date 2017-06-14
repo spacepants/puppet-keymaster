@@ -8,7 +8,7 @@ class keymaster::params {
   $keystore_ssh      = "${keystore_base}/ssh"
   $keystore_host_key = "${keystore_base}/host_key"
   $keystore_x509     = "${keystore_base}/x509"
-  $ruby_path         = '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin'
+  $ruby_path         = '/usr/local/bin'
   $user              = 'puppet'
   $group             = 'puppet'
 

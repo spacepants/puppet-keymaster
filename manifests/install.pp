@@ -1,17 +1,15 @@
 # keymaster::install
 #
 class keymaster::install {
-  package { 'json':
-    ensure   => installed,
-    provider => gem,
-  }
-  package { 'mixlib-cli':
-    ensure   => installed,
-    provider => gem,
-  }
-  package { 'savon':
-    ensure   => installed,
-    provider => gem,
+
+  $gems = ['json', 'mixlib-cli', 'savon']
+
+  $gems.each |$gem| {
+    exec { "install ${gem}":
+      command => "gem install --no-ri --no-rdoc ${gem}",
+      path    => "${::keymaster::ruby_path}:/usr/bin:/usr/sbin:/bin",
+      unless  => "gem list | grep ${gem}",
+    }
   }
 
   file { '/usr/local/bin/cert-manager.rb':
