@@ -106,9 +106,16 @@ define keymaster::x509 (
     }
     else {
       $alias_string = join($aliases, ',')
+      if $alias_string != '' {
+        $alias_param = " --aliases \"${alias_string}\""
+      }
+      else {
+        $alias_param = ''
+      }
+
       # Submit CSR
       exec{"x509_${clean_name}_submit_csr":
-        command => "ruby cert-manager.rb --submit-csr --name ${common_name} --aliases ${alias_string} --term ${term}",
+        command => "ruby cert-manager.rb --submit-csr --name ${common_name}${alias_param} --term ${term}",
         cwd     => $cert_src_dir,
         user    => $::keymaster::user,
         group   => $::keymaster::group,

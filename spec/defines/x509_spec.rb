@@ -95,7 +95,7 @@ describe 'keymaster::x509', type: :define do
           }
           it { is_expected.to contain_exec('x509_test.example.org_submit_csr').with(
             path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
-            command: 'ruby cert-manager.rb --submit-csr --name test.example.org --aliases  --term 3',
+            command: 'ruby cert-manager.rb --submit-csr --name test.example.org --term 3',
             user:    'puppet',
             group:   'puppet',
             creates: '/etc/puppetlabs/keymaster/x509/test.example.org/id',
@@ -151,6 +151,25 @@ describe 'keymaster::x509', type: :define do
           }
           it { is_expected.to contain_file('x509_test.example.org_cnf').without_content(
             /organizationName       =/
+            )
+          }
+        end
+        context 'when requesting a cert with aliases' do
+          let(:title) {
+            'test.example.org'
+          }
+          let(:params) {{
+            common_name: 'test.example.org',
+            aliases:     ['this', 'that', 'the-other'],
+          }}
+          it { is_expected.to contain_exec('x509_test.example.org_submit_csr').with(
+            path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
+            command: 'ruby cert-manager.rb --submit-csr --name test.example.org --aliases "this,that,the-other" --term 3',
+            user:    'puppet',
+            group:   'puppet',
+            creates: '/etc/puppetlabs/keymaster/x509/test.example.org/id',
+            ).that_requires('File[x509_test.example.org_csr]').that_comes_before(
+              'File[x509_test.example.org_id]'
             )
           }
         end
@@ -359,7 +378,7 @@ describe 'keymaster::x509', type: :define do
           }
           it { is_expected.to contain_exec('x509_wild.example.org_submit_csr').with(
             path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
-            command: 'ruby cert-manager.rb --submit-csr --name *.example.org --aliases  --term 3',
+            command: 'ruby cert-manager.rb --submit-csr --name *.example.org --term 3',
             user:    'puppet',
             group:   'puppet',
             creates: '/etc/puppetlabs/keymaster/x509/wild.example.org/id',
