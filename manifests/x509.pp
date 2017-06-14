@@ -115,7 +115,7 @@ define keymaster::x509 (
 
       # Submit CSR
       exec{"x509_${clean_name}_submit_csr":
-        command => "ruby cert-manager.rb --submit-csr --name ${common_name}${alias_param} --term ${term}",
+        command => "ruby /usr/local/bin/cert-manager.rb --submit-csr --name ${common_name}${alias_param} --term ${term}",
         cwd     => $cert_src_dir,
         user    => $::keymaster::user,
         group   => $::keymaster::group,
@@ -131,7 +131,7 @@ define keymaster::x509 (
 
       # Get certificate
       exec{"x509_${clean_name}_pem":
-        command => 'ruby cert-manager.rb --get-cert',
+        command => 'ruby /usr/local/bin/cert-manager.rb --get-cert',
         cwd     => $cert_src_dir,
         user    => $::keymaster::user,
         group   => $::keymaster::group,
