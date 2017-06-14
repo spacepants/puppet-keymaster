@@ -2,13 +2,15 @@
 #
 class keymaster::install {
 
-  $gems = ['json', 'mixlib-cli', 'savon']
+  if $::keymaster::manage_gems {
+    $gems = ['json', 'mixlib-cli', 'savon']
 
-  $gems.each |$gem| {
-    exec { "install ${gem}":
-      command => "gem install --no-ri --no-rdoc ${gem}",
-      path    => "${::keymaster::ruby_path}:/usr/bin:/usr/sbin:/bin",
-      unless  => "gem list | grep ${gem}",
+    $gems.each |$gem| {
+      exec { "install ${gem}":
+        command => "gem install --no-ri --no-rdoc ${gem}",
+        path    => "${::keymaster::ruby_path}:/usr/bin:/usr/sbin:/bin",
+        unless  => "gem list | grep ${gem}",
+      }
     }
   }
 

@@ -22,6 +22,7 @@ class keymaster (
   String           $keystore_ssh      = $::keymaster::params::keystore_ssh,
   String           $keystore_host_key = $::keymaster::params::keystore_host_key,
   String           $keystore_x509     = $::keymaster::params::keystore_x509,
+  Boolean          $manage_gems       = true,
   Optional[String] $api_user          = undef,
   Optional[String] $api_pass          = undef,
   Optional[String] $api_org           = undef,

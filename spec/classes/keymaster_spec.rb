@@ -90,6 +90,7 @@ describe 'keymaster' do
         let(:params) {{
           user: 'specuser',
           group: 'specgroup',
+          manage_gems: false,
           keystore_base: '/path/to/keystore',
           keystore_ssh: '/path/to/keystore/specsshdir',
           keystore_host_key: '/path/to/keystore/spechostkeydir',
@@ -136,6 +137,9 @@ describe 'keymaster' do
           mode:     '0640',
           )
         }
+        it { is_expected.not_to contain_exec('install json') }
+        it { is_expected.not_to contain_exec('install mixlib-cli') }
+        it { is_expected.not_to contain_exec('install savon') }
         it { is_expected.to contain_file('/usr/local/etc/cert-manager.json').with(
           ensure: 'file',
           mode:   '0640',
