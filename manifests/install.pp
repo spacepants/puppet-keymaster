@@ -7,9 +7,10 @@ class keymaster::install {
 
     $gems.each |$gem| {
       exec { "install ${gem}":
-        command => "gem install --no-ri --no-rdoc ${gem}",
-        path    => "${::keymaster::ruby_path}:/usr/bin:/usr/sbin:/bin",
-        unless  => "gem list | grep ${gem}",
+        command     => "gem install --no-ri --no-rdoc ${gem}",
+        environment => $::keymaster::ruby_env,
+        path        => "${::keymaster::ruby_path}:/usr/bin:/usr/sbin:/bin",
+        unless      => "gem list | grep ${gem}",
       }
     }
   }

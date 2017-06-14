@@ -115,13 +115,14 @@ define keymaster::x509 (
 
       # Submit CSR
       exec{"x509_${clean_name}_submit_csr":
-        command => "ruby /usr/local/bin/cert-manager.rb --submit-csr --name ${common_name}${alias_param} --length ${term}",
-        cwd     => $cert_src_dir,
-        user    => $::keymaster::user,
-        group   => $::keymaster::group,
-        creates => $cert_id_file,
-        require => File["x509_${clean_name}_csr"],
-        before  => File["x509_${clean_name}_id"],
+        command     => "ruby /usr/local/bin/cert-manager.rb --submit-csr --name ${common_name}${alias_param} --length ${term}",
+        cwd         => $cert_src_dir,
+        user        => $::keymaster::user,
+        group       => $::keymaster::group,
+        environment => $::keymaster::ruby_env,
+        creates     => $cert_id_file,
+        require     => File["x509_${clean_name}_csr"],
+        before      => File["x509_${clean_name}_id"],
       }
 
       file{"x509_${clean_name}_id":
@@ -131,13 +132,14 @@ define keymaster::x509 (
 
       # Get certificate
       exec{"x509_${clean_name}_pem":
-        command => 'ruby /usr/local/bin/cert-manager.rb --get-cert',
-        cwd     => $cert_src_dir,
-        user    => $::keymaster::user,
-        group   => $::keymaster::group,
-        creates => $cert_pem_file,
-        require => File["x509_${clean_name}_id"],
-        before  => [
+        command     => 'ruby /usr/local/bin/cert-manager.rb --get-cert',
+        cwd         => $cert_src_dir,
+        user        => $::keymaster::user,
+        group       => $::keymaster::group,
+        environment => $::keymaster::ruby_env,
+        creates     => $cert_pem_file,
+        require     => File["x509_${clean_name}_id"],
+        before      => [
           File["x509_${clean_name}_pem"],
           File["x509_${clean_name}_renewid"],
         ],
