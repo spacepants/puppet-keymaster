@@ -95,7 +95,7 @@ describe 'keymaster::x509', type: :define do
           }
           it { is_expected.to contain_exec('x509_test.example.org_submit_csr').with(
             path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
-            command: 'ruby /usr/local/bin/cert-manager.rb --submit-csr --name test.example.org --term 3',
+            command: 'ruby /usr/local/bin/cert-manager.rb --submit-csr --name test.example.org --length 3',
             user:    'puppet',
             group:   'puppet',
             creates: '/etc/puppetlabs/keymaster/x509/test.example.org/id',
@@ -164,7 +164,7 @@ describe 'keymaster::x509', type: :define do
           }}
           it { is_expected.to contain_exec('x509_test.example.org_submit_csr').with(
             path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
-            command: 'ruby /usr/local/bin/cert-manager.rb --submit-csr --name test.example.org --aliases "this,that,the-other" --term 3',
+            command: 'ruby /usr/local/bin/cert-manager.rb --submit-csr --name test.example.org --aliases "this,that,the-other" --length 3',
             user:    'puppet',
             group:   'puppet',
             creates: '/etc/puppetlabs/keymaster/x509/test.example.org/id',
@@ -378,7 +378,7 @@ describe 'keymaster::x509', type: :define do
           }
           it { is_expected.to contain_exec('x509_wild.example.org_submit_csr').with(
             path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
-            command: 'ruby /usr/local/bin/cert-manager.rb --submit-csr --name *.example.org --term 3',
+            command: 'ruby /usr/local/bin/cert-manager.rb --submit-csr --name *.example.org --length 3',
             user:    'puppet',
             group:   'puppet',
             creates: '/etc/puppetlabs/keymaster/x509/wild.example.org/id',
