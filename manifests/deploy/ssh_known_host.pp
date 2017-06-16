@@ -12,9 +12,14 @@ define keymaster::deploy::ssh_known_host (
   Enum['present', 'absent'] $ensure  = 'present',
   Optional[String]          $path    = undef,
   Array[String]             $aliases = [],
+  Boolean                   $user_enforce = true,
 ) {
 
   include ::keymaster::params
+
+  if !defined(User[$user]) and $user_enforce {
+    fail("The user '${user}' has not been defined in Puppet")
+  }
 
   $key_src_dir  = "${::keymaster::params::keystore_host_key}/${name}"
   # filename of public key on the keymaster (source)
