@@ -5,11 +5,13 @@
 # @param $user User account to install the key. Required.
 # @param $ensure Whether the key should be present. Defaults to 'present'.
 # @param $options Any additional options passed to the ssh_authorized_key resource. Optional.
+# @param $user_enforce Whether to enforce a defined user in the catalog. Defaults to true.
 #
 define keymaster::deploy::ssh_authorized_key (
   String                    $user,
   Enum['present', 'absent'] $ensure  = 'present',
   Optional[Any]             $options = undef,
+  Boolean                   $user_enforce = true,
 ) {
 
   include ::keymaster::params
@@ -20,7 +22,7 @@ define keymaster::deploy::ssh_authorized_key (
   $key_src_file = "${key_src_dir}/key.pub"
   $key_src_content = file($key_src_file, '/dev/null')
 
-  if ! defined(User[$user]) {
+  if !defined(User[$user]) and $user_enforce {
     fail("The user '${user}' has not been defined in Puppet")
   }
 

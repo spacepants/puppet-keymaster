@@ -5,16 +5,18 @@
 # @param $user User account to install the keys. Required.
 # @param $filename Key filename. Required.
 # @param $ensure Whether the keys should be present. Defaults to 'present'.
+# @param $user_enforce Whether to enforce a defined user in the catalog. Defaults to true.
 #
 define keymaster::deploy::ssh_key_pair (
   String                    $user,
   String                    $filename,
   Enum['present', 'absent'] $ensure = 'present',
+  Boolean                   $user_enforce = true,
 ) {
 
   include ::keymaster::params
 
-  if ! defined(User[$user]) {
+  if !defined(User[$user]) and $user_enforce {
     fail("The user '${user}' has not been defined in Puppet")
   }
 
