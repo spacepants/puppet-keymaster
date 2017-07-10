@@ -11,6 +11,8 @@ define keymaster::deploy::ssh_known_host (
   String                    $user,
   Enum['present', 'absent'] $ensure  = 'present',
   Optional[String]          $path    = undef,
+  Optional[String]          $group = undef,
+  Optional[String]          $home = undef,
   Array[String]             $aliases = [],
   Boolean                   $user_enforce = true,
 ) {
@@ -29,15 +31,21 @@ define keymaster::deploy::ssh_known_host (
   $key_public_content  = file($key_public_file, '/dev/null')
 
   # get homedir of $user
-  $home  = getparam(User[$user],'home')
-  $group = getparam(User[$user],'gid')
-
-  if ! $home {
-    notify{"ssh_knownhost_${name}_did_not_run":
-      message => "Can't determine home directory of user ${user}",
-    }
+  if $home {
+    $real_home = $home
   }
-  elsif ! $key_public_content or empty($key_public_content) {
+  else {
+    $real_home = "/home/${user}"
+  }
+
+  if $group {
+    $real_group = $group
+  }
+  else {
+    $real_group = $user
+  }
+
+  if ! $key_public_content or empty($key_public_content) {
     notify{"ssh_knownhost_${name}_did_not_run":
       message => "Can't read public key ${key_public_file}",
     }
@@ -51,23 +59,12 @@ define keymaster::deploy::ssh_known_host (
       $real_path = $path
     }
     else {
-      $real_path = "${home}/.ssh/known_hosts"
-
-      # Mangling all the non-true values for group
-      # the choices were to force undefined or use $name
-      # $name might be unpredictible... so undef
-      if $group {
-        $real_group = $group
-      }
-      else {
-        warning("Can't determine primary group of user ${user}")
-        $real_group = undef
-      }
+      $real_path = "${real_home}/.ssh/known_hosts"
 
       if $ensure == 'present' {
         # create client user's .ssh directory if not defined already
-        if ! defined(File[ "${home}/.ssh" ]) {
-          file { "${home}/.ssh":
+        if ! defined(File[ "${real_home}/.ssh" ]) {
+          file { "${real_home}/.ssh":
             ensure => 'directory',
             owner  => $user,
             group  => $real_group,

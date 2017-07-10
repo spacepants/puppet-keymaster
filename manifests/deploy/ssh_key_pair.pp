@@ -10,6 +10,8 @@
 define keymaster::deploy::ssh_key_pair (
   String                    $user,
   String                    $filename,
+  Optional[String]          $group = undef,
+  Optional[String]          $home = undef,
   Enum['present', 'absent'] $ensure = 'present',
   Boolean                   $user_enforce = true,
 ) {
@@ -21,8 +23,19 @@ define keymaster::deploy::ssh_key_pair (
   }
 
   # get homedir and primary group of $user
-  $home  = getparam(User[$user],'home')
-  $group = getparam(User[$user],'gid')
+  if $home {
+    $real_home = $home
+  }
+  else {
+    $real_home = "/home/${user}"
+  }
+
+  if $group {
+    $real_group = $group
+  }
+  else {
+    $real_group = $user
+  }
 
   $clean_name = regsubst($name, '@', '_at_')
   $key_src_dir  = "${::keymaster::params::keystore_ssh}/${clean_name}"
@@ -31,7 +44,7 @@ define keymaster::deploy::ssh_key_pair (
   $key_public_file  = "${key_private_file}.pub"
 
   # filename of private key on the ssh client host (target)
-  $key_tgt_file = "${home}/.ssh/${filename}"
+  $key_tgt_file = "${real_home}/.ssh/${filename}"
 
   # read contents of key from the keymaster
   $key_public_content  = file($key_public_file, '/dev/null')
@@ -41,13 +54,6 @@ define keymaster::deploy::ssh_key_pair (
   # If 'absent', revoke the client keys
   if $ensure == 'absent' {
     file {[ $key_tgt_file, "${key_tgt_file}.pub" ]: ensure  => 'absent' }
-
-  # test for homedir and primary group
-  }
-  elsif ! $home {
-    notify{"ssh_keypair_${name}_did_not_run":
-      message => "Can't determine home directory of user ${user}",
-    }
   }
   elsif ! $key_public_content or empty($key_public_content) {
     notify{"ssh_keypair_${name}_did_not_run":
@@ -64,20 +70,9 @@ define keymaster::deploy::ssh_key_pair (
     $keytype = $1
     $modulus = $2
 
-    # Mangling all the non-true values for group
-    # the choices were to force undefined or use $name
-    # $name might be unpredictible... so undef
-    if $group {
-      $real_group = $group
-    }
-    else {
-      warning("Can't determine primary group of user ${user}")
-      $real_group = undef
-    }
-
     # create client user's .ssh directory if not defined already
-    if ! defined(File[ "${home}/.ssh" ]) {
-      file { "${home}/.ssh":
+    if ! defined(File[ "${real_home}/.ssh" ]) {
+      file { "${real_home}/.ssh":
         ensure => 'directory',
         owner  => $user,
         group  => $real_group,
@@ -91,7 +86,7 @@ define keymaster::deploy::ssh_key_pair (
       owner   => $user,
       group   => $real_group,
       mode    => '0600',
-      require => File["${home}/.ssh"],
+      require => File["${real_home}/.ssh"],
     }
 
     file { "${key_tgt_file}.pub":
@@ -100,7 +95,7 @@ define keymaster::deploy::ssh_key_pair (
       owner   => $user,
       group   => $real_group,
       mode    => '0644',
-      require => File["${home}/.ssh"],
+      require => File["${real_home}/.ssh"],
     }
 
   }
