@@ -40,7 +40,7 @@ define keymaster::deploy::host_key (
 
     ::ssh::server::host_key {$name:
       private_key_content => $key_private_content,
-      public_key_content  => "${keytype} ${modulus} ${name}",
+      public_key_content  => "${keytype} ${modulus} ${name}\n",
     }
 
   }

@@ -17,7 +17,7 @@ describe 'keymaster::deploy::host_key', type: :define do
           it { is_expected.to contain_class('keymaster::params') }
           it { is_expected.to contain_ssh__server__host_key('test.example.org').with(
             'private_key_content' => "-----BEGIN RSA PRIVATE KEY-----THISISAFAKERSAHASH-----END RSA PRIVATE KEY-----\n",
-            'public_key_content'  => 'ssh-rsa THISISAFAKERSAHASH test.example.org'
+            'public_key_content'  => "ssh-rsa THISISAFAKERSAHASH test.example.org\n"
             )
           }
         end
