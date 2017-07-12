@@ -80,12 +80,14 @@ define keymaster::deploy::x509_cert (
       }
       default: {
         # cert defaults to pem format
-        file {"x509_${name}_pem_certificate":
-          ensure  => $file_ensure,
-          path    => $real_path,
-          owner   => $owner,
-          group   => $owner,
-          content => $cert_content,
+        if $path {
+          file {"x509_${name}_pem_certificate":
+            ensure  => $file_ensure,
+            path    => $path,
+            owner   => $owner,
+            group   => $owner,
+            content => $cert_content,
+          }
         }
       }
     }
