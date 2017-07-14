@@ -32,6 +32,13 @@ define keymaster::deploy::x509_key (
   # read contents of key from the keymaster
   $key_content  = file($key_file, '/dev/null')
 
+  if $owner or $group {
+    $file_mode = '0640'
+  }
+  else {
+    $file_mode = '0644'
+  }
+
   if !$key_content or empty($key_content) {
     notify{"x509_${name}_key_did_not_run":
       message => "Can't read key ${key_file}",
@@ -44,15 +51,15 @@ define keymaster::deploy::x509_key (
       file {"x509_${name}_key":
         ensure  => $file_ensure,
         path    => "${::keymaster::params::x509_key_dir}/${name}.pem",
-        mode    => '0640',
+        mode    => '0644',
         content => $key_content,
       }
       file {"x509_${name}_private_key":
         ensure  => $file_ensure,
         path    => $path,
         owner   => $owner,
-        group   => $owner,
-        mode    => '0640',
+        group   => $group,
+        mode    => $file_mode,
         content => $key_content,
       }
     }
@@ -61,8 +68,8 @@ define keymaster::deploy::x509_key (
         ensure  => $file_ensure,
         path    => "${::keymaster::params::x509_key_dir}/${name}.pem",
         owner   => $owner,
-        group   => $owner,
-        mode    => '0640',
+        group   => $group,
+        mode    => $file_mode,
         content => $key_content,
       }
     }

@@ -25,6 +25,13 @@ define keymaster::deploy::x509_cert (
     $file_ensure = 'absent'
   }
 
+  if $owner or $group {
+    $file_mode = '0640'
+  }
+  else {
+    $file_mode = '0644'
+  }
+
   if $path {
     $real_path = $path
   }
@@ -84,6 +91,7 @@ define keymaster::deploy::x509_cert (
           file {"x509_${name}_pem_certificate":
             ensure  => $file_ensure,
             path    => $path,
+            mode    => $file_mode,
             owner   => $owner,
             group   => $owner,
             content => $cert_content,
