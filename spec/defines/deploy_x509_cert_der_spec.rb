@@ -8,7 +8,8 @@ describe 'keymaster::deploy::x509_cert::der', type: :define do
       end
       context 'with default keymaster and preseeded certificate' do
         let :pre_condition do
-          'include keymaster'
+          'include keymaster
+          ::keymaster::deploy::x509_cert { "test.example.org": }'
         end
         context 'with no parameters' do
           let :title do
@@ -104,6 +105,12 @@ describe 'keymaster::deploy::x509_cert::der', type: :define do
           }
         end
         context 'when absent' do
+          let :pre_condition do
+            'include keymaster
+            ::keymaster::deploy::x509_cert { "test.example.org":
+            ensure => "absent",
+            }'
+          end
           let :title do
             'test.example.org'
           end

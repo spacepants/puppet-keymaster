@@ -36,21 +36,30 @@ define keymaster::deploy::x509_cert::der (
 
   if $ensure == 'present' {
     $file_ensure = 'file'
-
-    exec { "convert_${name}_to_${type}":
-      command     => "openssl x509 -outform der -in ${pem_path} -out ${real_path}",
-      path        => '/usr/bin:/usr/sbin:/bin:/sbin',
-      refreshonly => true,
-      subscribe   => File["x509_${name}_certificate"],
-      before      => File["x509_${name}_${type}"],
-    }
   }
   else {
     $file_ensure = 'absent'
   }
 
-  file{"x509_${name}_${type}":
-    ensure => $file_ensure,
-    path   => $real_path,
+  if !defined(File["x509_${name}_certificate"]) {
+    notify{"x509_${name}_der_cert_did_not_run":
+      message => "Certificate file for ${name} unavailable",
+    }
+  }
+  else {
+    if $ensure == 'present' {
+      exec { "convert_${name}_to_${type}":
+        command     => "openssl x509 -outform der -in ${pem_path} -out ${real_path}",
+        path        => '/usr/bin:/usr/sbin:/bin:/sbin',
+        refreshonly => true,
+        subscribe   => File["x509_${name}_certificate"],
+        before      => File["x509_${name}_${type}"],
+      }
+    }
+
+    file{"x509_${name}_${type}":
+      ensure => $file_ensure,
+      path   => $real_path,
+    }
   }
 }

@@ -52,7 +52,7 @@ define keymaster::deploy::x509_cert::p12 (
   }
 
   if $pass {
-    $pass_opt = " -passout pass:${pass}"
+    $pass_opt = "-passout pass:${pass}"
   }
   else {
     $pass_opt = ''
@@ -60,24 +60,33 @@ define keymaster::deploy::x509_cert::p12 (
 
   if $ensure == 'present' {
     $file_ensure = 'file'
-
-    exec { "convert_${name}_to_${type}":
-      command     => "openssl pkcs12 -export -out ${real_path} -in ${pem_path} ${key_opt}${pass_opt}",
-      path        => '/usr/bin:/usr/sbin:/bin:/sbin',
-      refreshonly => true,
-      before      => File["x509_${name}_${type}"],
-      subscribe   => [
-        File["x509_${name}_certificate"],
-        File["x509_${name}_private_key"],
-      ],
-    }
   }
   else {
     $file_ensure = 'absent'
   }
 
-  file{"x509_${name}_${type}":
-    ensure => $file_ensure,
-    path   => $real_path,
+  if !defined(File["x509_${name}_certificate"]) {
+    notify{"x509_${name}_p12_cert_did_not_run":
+      message => "Certificate file for ${name} unavailable",
+    }
+  }
+  else {
+    if $ensure == 'present' {
+      exec { "convert_${name}_to_${type}":
+        command     => "openssl pkcs12 -export -out ${real_path} -in ${pem_path} ${key_opt} ${pass_opt}",
+        path        => '/usr/bin:/usr/sbin:/bin:/sbin',
+        refreshonly => true,
+        before      => File["x509_${name}_${type}"],
+        subscribe   => [
+          File["x509_${name}_certificate"],
+          File["x509_${name}_private_key"],
+        ],
+      }
+    }
+
+    file{"x509_${name}_${type}":
+      ensure => $file_ensure,
+      path   => $real_path,
+    }
   }
 }

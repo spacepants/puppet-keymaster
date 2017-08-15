@@ -8,7 +8,8 @@ describe 'keymaster::deploy::x509_cert::p12', type: :define do
       end
       context 'with default keymaster and preseeded certificate' do
         let :pre_condition do
-          'include keymaster'
+          'include keymaster
+          ::keymaster::deploy::x509_cert { "test.example.org": }'
         end
         context 'with no parameters' do
           let :title do
@@ -23,7 +24,7 @@ describe 'keymaster::deploy::x509_cert::p12', type: :define do
             )
           }
           it { is_expected.to contain_exec('convert_test.example.org_to_p12').with(
-            command: 'openssl pkcs12 -export -out /etc/pki/tls/certs/test.example.org.p12 -in /etc/pki/tls/certs/test.example.org.pem -inkey /etc/pki/tls/private/test.example.org.key',
+            command: 'openssl pkcs12 -export -out /etc/pki/tls/certs/test.example.org.p12 -in /etc/pki/tls/certs/test.example.org.pem -inkey /etc/pki/tls/private/test.example.org.key ',
             path: '/usr/bin:/usr/sbin:/bin:/sbin',
             refreshonly: true,
             ).that_comes_before('File[x509_test.example.org_p12]').that_subscribes_to(
@@ -78,7 +79,7 @@ describe 'keymaster::deploy::x509_cert::p12', type: :define do
             }
           end
           it { is_expected.to contain_exec('convert_test.example.org_to_pfx').with(
-            command: 'openssl pkcs12 -export -out /etc/pki/tls/certs/test.example.org.pfx -in /etc/pki/tls/certs/test.example.org.pem -inkey /etc/pki/tls/private/test.example.org.key',
+            command: 'openssl pkcs12 -export -out /etc/pki/tls/certs/test.example.org.pfx -in /etc/pki/tls/certs/test.example.org.pem -inkey /etc/pki/tls/private/test.example.org.key ',
             path: '/usr/bin:/usr/sbin:/bin:/sbin',
             refreshonly: true,
             ).that_comes_before('File[x509_test.example.org_pfx]').that_subscribes_to(
@@ -105,7 +106,7 @@ describe 'keymaster::deploy::x509_cert::p12', type: :define do
           end
           it { is_expected.not_to contain_keymaster__deploy__x509_key('test.example.org') }
           it { is_expected.to contain_exec('convert_test.example.org_to_p12').with(
-            command: 'openssl pkcs12 -export -out /etc/pki/tls/certs/test.example.org.p12 -in /etc/pki/tls/certs/test.example.org.pem -nokeys',
+            command: 'openssl pkcs12 -export -out /etc/pki/tls/certs/test.example.org.p12 -in /etc/pki/tls/certs/test.example.org.pem -nokeys ',
             path: '/usr/bin:/usr/sbin:/bin:/sbin',
             refreshonly: true,
             ).that_comes_before('File[x509_test.example.org_p12]').that_subscribes_to(
@@ -114,6 +115,12 @@ describe 'keymaster::deploy::x509_cert::p12', type: :define do
           }
         end
         context 'when absent' do
+          let :pre_condition do
+            'include keymaster
+            ::keymaster::deploy::x509_cert { "test.example.org":
+            ensure => "absent",
+            }'
+          end
           let :title do
             'test.example.org'
           end
@@ -148,7 +155,7 @@ describe 'keymaster::deploy::x509_cert::p12', type: :define do
           end
           it { is_expected.to compile.with_all_deps }
           it { is_expected.to contain_exec('convert_test.example.org_to_p12').with(
-            command: 'openssl pkcs12 -export -out /etc/pki/tls/certs/test.example.org.p12 -in /etc/pki/tls/certs/test.example.org.pem -inkey /etc/pki/tls/private/test.example.org.key',
+            command: 'openssl pkcs12 -export -out /etc/pki/tls/certs/test.example.org.p12 -in /etc/pki/tls/certs/test.example.org.pem -inkey /etc/pki/tls/private/test.example.org.key ',
             path: '/usr/bin:/usr/sbin:/bin:/sbin',
             refreshonly: true,
             ).that_comes_before('File[x509_test.example.org_p12]').that_subscribes_to(
