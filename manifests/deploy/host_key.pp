@@ -9,6 +9,7 @@ define keymaster::deploy::host_key (
 ) {
 
   include ::keymaster::params
+  include ::ssh
 
   $key_src_dir  = "${::keymaster::params::keystore_host_key}/${name}"
   # filename of private key on the keymaster (source)
@@ -41,7 +42,7 @@ define keymaster::deploy::host_key (
     ::ssh::server::host_key {$name:
       private_key_content => $key_private_content,
       public_key_content  => "${keytype} ${modulus} ${name}\n",
+      before              => Concat['/etc/ssh/sshd_config'],
     }
-
   }
 }
