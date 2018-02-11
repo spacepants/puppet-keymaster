@@ -10,9 +10,10 @@
 define keymaster::deploy::ssh_key_pair (
   String                    $user,
   String                    $filename,
-  Optional[String]          $group = undef,
-  Optional[String]          $home = undef,
-  Enum['present', 'absent'] $ensure = 'present',
+  Optional[String]          $group        = undef,
+  Optional[String]          $home         = undef,
+  Enum['present', 'absent'] $ensure       = 'present',
+  Optional[String]          $target_dir   = undef,
   Boolean                   $user_enforce = true,
 ) {
 
@@ -43,8 +44,16 @@ define keymaster::deploy::ssh_key_pair (
   $key_private_file = "${key_src_dir}/key"
   $key_public_file  = "${key_private_file}.pub"
 
+  # key target directory
+  if $target_dir {
+    $real_target_dir = $target_dir
+  }
+  else {
+    $real_target_dir = "${real_home}/.ssh"
+  }
+
   # filename of private key on the ssh client host (target)
-  $key_tgt_file = "${real_home}/.ssh/${filename}"
+  $key_tgt_file = "${real_target_dir}/${filename}"
 
   # read contents of key from the keymaster
   $key_public_content  = file($key_public_file, '/dev/null')
@@ -71,8 +80,8 @@ define keymaster::deploy::ssh_key_pair (
     $modulus = $2
 
     # create client user's .ssh directory if not defined already
-    if ! defined(File[ "${real_home}/.ssh" ]) {
-      file { "${real_home}/.ssh":
+    if ! defined(File[ $real_target_dir ]) {
+      file { $real_target_dir:
         ensure => 'directory',
         owner  => $user,
         group  => $real_group,

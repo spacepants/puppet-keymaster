@@ -83,6 +83,6 @@ define keymaster::deploy::ssh_known_host (
     }
   }
   else {
-    warning("Private key file ${key_public_file} for key ${name} not found on keymaster.")
+    warning("Public key file ${key_public_file} for key ${name} not found on keymaster.")
   }
 }
