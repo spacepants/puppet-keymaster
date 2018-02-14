@@ -19,7 +19,7 @@ describe 'keymaster::host_key', type: :define do
           it { is_expected.to contain_file('host_key_test.example.org_dir').with(
             'ensure' => 'directory',
             'path'   => '/etc/puppetlabs/keymaster/host_key/test.example.org',
-            'mode'   => '0644',
+            'mode'   => '0750',
             'owner' => 'puppet',
             'group' => 'puppet'
             )

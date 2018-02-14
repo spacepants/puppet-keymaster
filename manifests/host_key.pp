@@ -55,7 +55,7 @@ define keymaster::host_key (
   file { "host_key_${name}_dir":
     ensure => directory,
     path   => $key_dir,
-    mode   => '0644',
+    mode   => '0750',
   }
 
   file { "host_key_${name}_key":

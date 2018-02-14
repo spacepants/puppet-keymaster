@@ -18,7 +18,7 @@ describe 'keymaster::ssh_key', type: :define do
           it { is_expected.to contain_file('tester@test.example.org_dir').with(
             'ensure' => 'directory',
             'path'   => '/etc/puppetlabs/keymaster/ssh/tester_at_test.example.org',
-            'mode'   => '0644',
+            'mode'   => '0750',
             'owner' => 'puppet',
             'group' => 'puppet'
             )

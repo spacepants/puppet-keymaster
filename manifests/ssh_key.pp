@@ -56,7 +56,7 @@ define keymaster::ssh_key (
   file { "${name}_dir":
     ensure => directory,
     path   => $keydir,
-    mode   => '0644',
+    mode   => '0750',
   }
 
   file { "${name}_key":
