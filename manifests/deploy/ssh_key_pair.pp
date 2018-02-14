@@ -95,7 +95,7 @@ define keymaster::deploy::ssh_key_pair (
       owner   => $user,
       group   => $real_group,
       mode    => '0600',
-      require => File["${real_home}/.ssh"],
+      require => File[$real_target_dir],
     }
 
     file { "${key_tgt_file}.pub":
@@ -104,7 +104,7 @@ define keymaster::deploy::ssh_key_pair (
       owner   => $user,
       group   => $real_group,
       mode    => '0644',
-      require => File["${real_home}/.ssh"],
+      require => File[$real_target_dir],
     }
 
   }
