@@ -11,7 +11,7 @@
 # @param $aliases Any additional aliases to include as subject alt names. Optional.
 # @param $email Email address for cert. Optional.
 # @param $days Cert valid duration in days, if self signed. Defaults to '365'.
-# @param $term Cert valid duration in years, if not self signed. Defaults to '3'.
+# @param $term Cert valid duration in years, if not self signed. Defaults to '2'.
 # @param $length RSA key size. Defaults to '4096'.
 # @param $self_signed Should this be a self-signed certificate. Defaults to false.
 #
@@ -25,7 +25,7 @@ define keymaster::x509 (
   Array                                     $aliases      = [],
   Optional[String]                          $email        = undef,
   String                                    $days         = '365',
-  String                                    $term         = '3',
+  String                                    $term         = '2',
   String                                    $length       = '4096',
   Boolean                                   $self_signed  = false,
 ) {
