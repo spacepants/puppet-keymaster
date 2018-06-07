@@ -122,10 +122,11 @@ describe 'keymaster::x509', type: :define do
             )
           }
           it { is_expected.to contain_exec('x509_test.example.org_sha1').with(
-            path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
-            command: "openssl x509 -noout -fingerprint -sha1 -inform pem -in /etc/puppetlabs/keymaster/x509/test.example.org/certificate.pem | awk -F= '{print $2}' | sed s/\\:/\\/g > /etc/puppetlabs/keymaster/x509/test.example.org/certificate.sha1",
-            user:    'puppet',
-            group:   'puppet',
+            path:        '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
+            command:     "openssl x509 -noout -fingerprint -sha1 -inform pem -in /etc/puppetlabs/keymaster/x509/test.example.org/certificate.pem | awk -F= '{print $2}' | sed s/\\:/\\/g > /etc/puppetlabs/keymaster/x509/test.example.org/certificate.sha1",
+            refreshonly: true,
+            user:        'puppet',
+            group:       'puppet',
           ).that_subscribes_to('Exec[x509_test.example.org_pem]').that_comes_before(
               'File[x509_test.example.org_sha1]'
             )

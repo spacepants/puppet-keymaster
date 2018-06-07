@@ -177,9 +177,10 @@ define keymaster::x509 (
     "> ${cert_sha1_file}",
   ]
   exec{"x509_${clean_name}_sha1":
-    command   => inline_template('<%= @sha_cmd.join(" ") %>'),
-    subscribe => Exec["x509_${clean_name}_pem"],
-    before    => File["x509_${clean_name}_sha1"],
+    command     => inline_template('<% = @sha_cmd.join(" ") %>'),
+    refreshonly => true,
+    subscribe   => Exec["x509_${clean_name}_pem"],
+    before      => File["x509_${clean_name}_sha1"],
   }
 
   file{"x509_${clean_name}_sha1":
