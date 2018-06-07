@@ -58,6 +58,7 @@ define keymaster::x509 (
   $cert_id_file      = "${cert_src_dir}/id"
   $cert_renewid_file = "${cert_src_dir}/renewid"
   $cert_pem_file     = "${cert_src_dir}/certificate.pem"
+  $cert_sha1_file     = "${cert_src_dir}/certificate.sha1"
 
 
   # Create the x509 store directory
@@ -165,5 +166,24 @@ define keymaster::x509 (
   file{"x509_${clean_name}_pem":
     ensure => $file_ensure,
     path   => $cert_pem_file,
+  }
+
+  # export cert fingerprint
+  $sha_cmd = [
+    'openssl x509 -noout -fingerprint -sha1',
+    "-inform pem -in ${cert_pem_file}",
+    "| awk -F= '{print $2}'",
+    '| sed s/\:/\/g',
+    "> ${cert_sha1_file}",
+  ]
+  exec{"x509_${clean_name}_sha1":
+    command   => inline_template('<%= @sha_cmd.join(" ") %>'),
+    subscribe => Exec["x509_${clean_name}_pem"],
+    before    => File["x509_${clean_name}_sha1"],
+  }
+
+  file{"x509_${clean_name}_sha1":
+    ensure => $file_ensure,
+    path   => $cert_sha1_file,
   }
 }

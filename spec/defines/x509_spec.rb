@@ -73,6 +73,14 @@ describe 'keymaster::x509', type: :define do
             group:  'puppet'
             )
           }
+          it { is_expected.to contain_file('x509_test.example.org_sha1').with(
+            ensure: 'file',
+            path:   '/etc/puppetlabs/keymaster/x509/test.example.org/certificate.sha1',
+            mode:   '0640',
+            owner:  'puppet',
+            group:  'puppet'
+            )
+          }
           it { is_expected.to contain_exec('x509_test.example.org_key').with(
             path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
             command: 'openssl genrsa -out /etc/puppetlabs/keymaster/x509/test.example.org/key.pem 4096',
@@ -111,6 +119,15 @@ describe 'keymaster::x509', type: :define do
             creates: '/etc/puppetlabs/keymaster/x509/test.example.org/certificate.pem',
             ).that_requires('File[x509_test.example.org_id]').that_comes_before(
               'File[x509_test.example.org_pem]'
+            )
+          }
+          it { is_expected.to contain_exec('x509_test.example.org_sha1').with(
+            path:    '/usr/local/bin:/usr/bin:/usr/sbin:/bin:/sbin',
+            command: "openssl x509 -noout -fingerprint -sha1 -inform pem -in /etc/puppetlabs/keymaster/x509/test.example.org/certificate.pem | awk -F= '{print $2}' | sed s/\\:/\\/g > /etc/puppetlabs/keymaster/x509/test.example.org/certificate.sha1",
+            user:    'puppet',
+            group:   'puppet',
+          ).that_subscribes_to('Exec[x509_test.example.org_pem]').that_comes_before(
+              'File[x509_test.example.org_sha1]'
             )
           }
           it { is_expected.to contain_file('x509_test.example.org_cnf').with_content(
